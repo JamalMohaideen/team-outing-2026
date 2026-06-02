@@ -1,5 +1,4 @@
 <!DOCTYPE html>
-const SCRIPT_URL = https://script.google.com/macros/s/AKfycbwF3gkWGOsBkZ-XHzqemvatCcyOtcVXD_S84Juk983nqgPSbeKRji_GeAgkhfCNnTPzbA/exec;
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
@@ -512,7 +511,7 @@ const SCRIPT_URL = https://script.google.com/macros/s/AKfycbwF3gkWGOsBkZ-XHzqemv
 
   <script>
     // ⚠️ Paste your Google Apps Script Web App URL here after deploying
-    const SCRIPT_URL = 'YOUR_APPS_SCRIPT_URL';
+    const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwF3gkWGOsBkZ-XHzqemvatCcyOtcVXD_S84Juk983nqgPSbeKRji_GeAgkhfCNnTPzbA/exec';
 
     document.getElementById('surveyForm').addEventListener('submit', function(e) {
       e.preventDefault();
@@ -531,14 +530,15 @@ const SCRIPT_URL = https://script.google.com/macros/s/AKfycbwF3gkWGOsBkZ-XHzqemv
       btn.disabled = true;
       btn.textContent = 'Submitting...';
 
-      const payload = new URLSearchParams({
+      const params = new URLSearchParams({
+        action: 'submit',
         name,
         dates: dates.join(', '),
         tripType,
         activities: activities.join(', ')
       });
 
-      fetch(SCRIPT_URL, { method: 'POST', body: payload })
+      fetch(`${SCRIPT_URL}?${params}`, { redirect: 'follow' })
         .then(res => res.json())
         .then(data => {
           if (data.result === 'success') {

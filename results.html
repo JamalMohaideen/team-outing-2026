@@ -1,5 +1,4 @@
 <!DOCTYPE html>
-const SCRIPT_URL = https://script.google.com/macros/s/AKfycbwF3gkWGOsBkZ-XHzqemvatCcyOtcVXD_S84Juk983nqgPSbeKRji_GeAgkhfCNnTPzbA/exec;
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
@@ -304,11 +303,10 @@ const SCRIPT_URL = https://script.google.com/macros/s/AKfycbwF3gkWGOsBkZ-XHzqemv
   </div>
 
   <script>
-    // ⚠️ Paste your Google Apps Script Web App URL here after deploying
-    const SCRIPT_URL = 'YOUR_APPS_SCRIPT_URL';
+    const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwF3gkWGOsBkZ-XHzqemvatCcyOtcVXD_S84Juk983nqgPSbeKRji_GeAgkhfCNnTPzbA/exec';
 
     async function getResponses() {
-      const res = await fetch(SCRIPT_URL);
+      const res = await fetch(SCRIPT_URL, { redirect: 'follow' });
       if (!res.ok) throw new Error('Network error — could not reach the Apps Script.');
       const data = await res.json();
       if (data.result !== 'success') throw new Error(data.error || 'Unknown error from Apps Script.');
