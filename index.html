@@ -1,0 +1,551 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Team Outing Survey 2026</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      padding: 40px 20px;
+    }
+
+    .container {
+      max-width: 680px;
+      margin: 0 auto;
+    }
+
+    .header {
+      text-align: center;
+      margin-bottom: 32px;
+      color: white;
+    }
+
+    .header h1 {
+      font-size: 2rem;
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+
+    .header p {
+      font-size: 1rem;
+      opacity: 0.85;
+    }
+
+    .card {
+      background: white;
+      border-radius: 16px;
+      padding: 32px;
+      margin-bottom: 20px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.12);
+    }
+
+    .section-label {
+      font-size: 0.75rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: #7c3aed;
+      margin-bottom: 8px;
+    }
+
+    h2 {
+      font-size: 1.15rem;
+      font-weight: 600;
+      color: #1e1b4b;
+      margin-bottom: 20px;
+    }
+
+    /* Name field */
+    .field label {
+      display: block;
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: #374151;
+      margin-bottom: 6px;
+    }
+
+    .field input[type="text"] {
+      width: 100%;
+      padding: 10px 14px;
+      border: 2px solid #e5e7eb;
+      border-radius: 8px;
+      font-size: 0.95rem;
+      transition: border-color 0.2s;
+      outline: none;
+    }
+
+    .field input[type="text"]:focus {
+      border-color: #7c3aed;
+    }
+
+    /* Date grid */
+    .date-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+
+    .date-option {
+      position: relative;
+    }
+
+    .date-option input[type="checkbox"] {
+      position: absolute;
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+
+    .date-option label {
+      display: flex;
+      flex-direction: column;
+      padding: 12px 16px;
+      border: 2px solid #e5e7eb;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: all 0.2s;
+      user-select: none;
+    }
+
+    .date-option label .month {
+      font-size: 0.7rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      color: #9ca3af;
+      margin-bottom: 2px;
+    }
+
+    .date-option label .day {
+      font-size: 1rem;
+      font-weight: 600;
+      color: #1e1b4b;
+    }
+
+    .date-option input:checked + label {
+      border-color: #7c3aed;
+      background: #f5f3ff;
+    }
+
+    .date-option input:checked + label .month {
+      color: #7c3aed;
+    }
+
+    .date-option label:hover {
+      border-color: #a78bfa;
+      background: #faf5ff;
+    }
+
+    /* Trip type */
+    .trip-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+
+    .trip-option {
+      position: relative;
+    }
+
+    .trip-option input[type="radio"] {
+      position: absolute;
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+
+    .trip-option label {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 14px 16px;
+      border: 2px solid #e5e7eb;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: all 0.2s;
+      user-select: none;
+      font-weight: 600;
+      color: #374151;
+      font-size: 0.9rem;
+    }
+
+    .trip-option label .icon {
+      font-size: 1.4rem;
+    }
+
+    .trip-option input:checked + label {
+      border-color: #7c3aed;
+      background: #f5f3ff;
+      color: #5b21b6;
+    }
+
+    .trip-option label:hover {
+      border-color: #a78bfa;
+      background: #faf5ff;
+    }
+
+    /* Activity grid */
+    .activity-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+
+    .activity-option {
+      position: relative;
+    }
+
+    .activity-option input[type="checkbox"] {
+      position: absolute;
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+
+    .activity-option label {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      gap: 6px;
+      padding: 16px 12px;
+      border: 2px solid #e5e7eb;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: all 0.2s;
+      user-select: none;
+    }
+
+    .activity-option label .icon {
+      font-size: 1.8rem;
+    }
+
+    .activity-option label .name {
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: #374151;
+    }
+
+    .activity-option label .desc {
+      font-size: 0.72rem;
+      color: #9ca3af;
+      line-height: 1.3;
+    }
+
+    .activity-option input:checked + label {
+      border-color: #7c3aed;
+      background: #f5f3ff;
+    }
+
+    .activity-option input:checked + label .name {
+      color: #5b21b6;
+    }
+
+    .activity-option label:hover {
+      border-color: #a78bfa;
+      background: #faf5ff;
+    }
+
+    /* Submit */
+    .submit-btn {
+      width: 100%;
+      padding: 16px;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      border: none;
+      border-radius: 12px;
+      font-size: 1rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: opacity 0.2s, transform 0.1s;
+      letter-spacing: 0.5px;
+    }
+
+    .submit-btn:hover {
+      opacity: 0.92;
+      transform: translateY(-1px);
+    }
+
+    .submit-btn:active {
+      transform: translateY(0);
+    }
+
+    /* Thank you */
+    .thankyou {
+      display: none;
+      text-align: center;
+      padding: 48px 32px;
+    }
+
+    .thankyou .big-icon {
+      font-size: 3.5rem;
+      margin-bottom: 16px;
+    }
+
+    .thankyou h2 {
+      font-size: 1.5rem;
+      color: #1e1b4b;
+      margin-bottom: 10px;
+      justify-content: center;
+    }
+
+    .thankyou p {
+      color: #6b7280;
+      font-size: 0.95rem;
+      line-height: 1.6;
+    }
+
+    .note {
+      font-size: 0.78rem;
+      color: #9ca3af;
+      margin-top: 12px;
+      font-style: italic;
+    }
+
+    @media (max-width: 480px) {
+      .date-grid, .trip-grid, .activity-grid { grid-template-columns: 1fr; }
+      .header h1 { font-size: 1.5rem; }
+      .card { padding: 22px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>🏕️ Team Outing 2026</h1>
+      <p>Help us plan the perfect outing — takes less than 2 minutes!</p>
+    </div>
+
+    <form id="surveyForm">
+
+      <!-- Name -->
+      <div class="card">
+        <div class="section-label">About You</div>
+        <h2>What's your name?</h2>
+        <div class="field">
+          <label for="name">Full Name</label>
+          <input type="text" id="name" name="name" placeholder="e.g. Alex Johnson" required />
+        </div>
+      </div>
+
+      <!-- Preferred Dates -->
+      <div class="card">
+        <div class="section-label">Step 1 of 3</div>
+        <h2>Which Fridays work for you? <span class="note">(select all that apply)</span></h2>
+        <div class="date-grid">
+
+          <div class="date-option">
+            <input type="checkbox" id="jun5" name="dates" value="June 5" />
+            <label for="jun5">
+              <span class="month">June</span>
+              <span class="day">Friday, June 5</span>
+            </label>
+          </div>
+
+          <div class="date-option">
+            <input type="checkbox" id="jun12" name="dates" value="June 12" />
+            <label for="jun12">
+              <span class="month">June</span>
+              <span class="day">Friday, June 12</span>
+            </label>
+          </div>
+
+          <div class="date-option">
+            <input type="checkbox" id="jun19" name="dates" value="June 19" />
+            <label for="jun19">
+              <span class="month">June</span>
+              <span class="day">Friday, June 19</span>
+            </label>
+          </div>
+
+          <div class="date-option">
+            <input type="checkbox" id="jun26" name="dates" value="June 26" />
+            <label for="jun26">
+              <span class="month">June</span>
+              <span class="day">Friday, June 26</span>
+            </label>
+          </div>
+
+          <div class="date-option">
+            <input type="checkbox" id="jul3" name="dates" value="July 3" />
+            <label for="jul3">
+              <span class="month">July</span>
+              <span class="day">Friday, July 3</span>
+            </label>
+          </div>
+
+          <div class="date-option">
+            <input type="checkbox" id="jul10" name="dates" value="July 10" />
+            <label for="jul10">
+              <span class="month">July</span>
+              <span class="day">Friday, July 10</span>
+            </label>
+          </div>
+
+          <div class="date-option">
+            <input type="checkbox" id="jul17" name="dates" value="July 17" />
+            <label for="jul17">
+              <span class="month">July</span>
+              <span class="day">Friday, July 17</span>
+            </label>
+          </div>
+
+          <div class="date-option">
+            <input type="checkbox" id="jul24" name="dates" value="July 24" />
+            <label for="jul24">
+              <span class="month">July</span>
+              <span class="day">Friday, July 24</span>
+            </label>
+          </div>
+
+          <div class="date-option">
+            <input type="checkbox" id="jul31" name="dates" value="July 31" />
+            <label for="jul31">
+              <span class="month">July</span>
+              <span class="day">Friday, July 31</span>
+            </label>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- Trip Type -->
+      <div class="card">
+        <div class="section-label">Step 2 of 3</div>
+        <h2>What type of outing do you prefer?</h2>
+        <div class="trip-grid">
+
+          <div class="trip-option">
+            <input type="radio" id="fullday" name="tripType" value="Full Day" required />
+            <label for="fullday">
+              <span class="icon">☀️</span> Full Day
+            </label>
+          </div>
+
+          <div class="trip-option">
+            <input type="radio" id="overnight" name="tripType" value="Overnight" />
+            <label for="overnight">
+              <span class="icon">🌙</span> Overnight
+            </label>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- Activity Preferences -->
+      <div class="card">
+        <div class="section-label">Step 3 of 3</div>
+        <h2>What kind of activities excite you? <span class="note">(select all that apply)</span></h2>
+        <div class="activity-grid">
+
+          <div class="activity-option">
+            <input type="checkbox" id="adventure" name="activities" value="Adventure" />
+            <label for="adventure">
+              <span class="icon">🧗</span>
+              <span class="name">Adventure</span>
+              <span class="desc">Hiking, zip-lining, water sports</span>
+            </label>
+          </div>
+
+          <div class="activity-option">
+            <input type="checkbox" id="leisure" name="activities" value="Leisure" />
+            <label for="leisure">
+              <span class="icon">🏖️</span>
+              <span class="name">Leisure</span>
+              <span class="desc">Relaxing, spa, scenic spots</span>
+            </label>
+          </div>
+
+          <div class="activity-option">
+            <input type="checkbox" id="learning" name="activities" value="Learning" />
+            <label for="learning">
+              <span class="icon">🎨</span>
+              <span class="name">Learning</span>
+              <span class="desc">Workshops, cooking, art classes</span>
+            </label>
+          </div>
+
+          <div class="activity-option">
+            <input type="checkbox" id="volunteering" name="activities" value="Volunteering" />
+            <label for="volunteering">
+              <span class="icon">🤝</span>
+              <span class="name">Volunteering</span>
+              <span class="desc">Community service, giving back</span>
+            </label>
+          </div>
+
+          <div class="activity-option" style="grid-column: span 2;">
+            <input type="checkbox" id="mixed" name="activities" value="Mixed" />
+            <label for="mixed" style="flex-direction: row; text-align: left; justify-content: flex-start;">
+              <span class="icon">🎲</span>
+              <div>
+                <span class="name">Mixed — A bit of everything!</span>
+                <span class="desc" style="display:block;">Combine multiple activity types</span>
+              </div>
+            </label>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- Submit -->
+      <div class="card">
+        <button type="submit" class="submit-btn">Submit My Preferences 🚀</button>
+      </div>
+
+    </form>
+
+    <!-- Thank You -->
+    <div class="card thankyou" id="thankYou">
+      <div class="big-icon">🎉</div>
+      <h2>Thanks for responding!</h2>
+      <p>Your preferences have been recorded. We'll share the final outing plan once all responses are in — stay tuned!</p>
+    </div>
+
+  </div>
+
+  <script>
+    document.getElementById('surveyForm').addEventListener('submit', function(e) {
+      e.preventDefault();
+
+      const name = document.getElementById('name').value.trim();
+      const dates = [...document.querySelectorAll('input[name="dates"]:checked')].map(el => el.value);
+      const tripType = document.querySelector('input[name="tripType"]:checked')?.value;
+      const activities = [...document.querySelectorAll('input[name="activities"]:checked')].map(el => el.value);
+
+      if (!name) {
+        alert('Please enter your name.');
+        return;
+      }
+      if (dates.length === 0) {
+        alert('Please select at least one preferred date.');
+        return;
+      }
+      if (!tripType) {
+        alert('Please select a trip type (Full Day or Overnight).');
+        return;
+      }
+      if (activities.length === 0) {
+        alert('Please select at least one activity preference.');
+        return;
+      }
+
+      // Save to localStorage
+      const response = { name, dates, tripType, activities, submittedAt: new Date().toISOString() };
+      const existing = JSON.parse(localStorage.getItem('outingResponses') || '[]');
+      existing.push(response);
+      localStorage.setItem('outingResponses', JSON.stringify(existing));
+
+      // Show thank you
+      document.getElementById('surveyForm').style.display = 'none';
+      const ty = document.getElementById('thankYou');
+      ty.style.display = 'block';
+    });
+  </script>
+</body>
+</html>

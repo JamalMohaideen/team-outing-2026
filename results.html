@@ -1,0 +1,494 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Team Outing — Results Dashboard</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      padding: 40px 20px;
+    }
+
+    .container {
+      max-width: 780px;
+      margin: 0 auto;
+    }
+
+    .header {
+      text-align: center;
+      color: white;
+      margin-bottom: 32px;
+    }
+
+    .header h1 { font-size: 2rem; font-weight: 700; margin-bottom: 6px; }
+    .header p { opacity: 0.85; font-size: 0.95rem; }
+
+    .stats-row {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 14px;
+      margin-bottom: 20px;
+    }
+
+    .stat-card {
+      background: white;
+      border-radius: 14px;
+      padding: 20px;
+      text-align: center;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.1);
+    }
+
+    .stat-card .number {
+      font-size: 2.2rem;
+      font-weight: 700;
+      color: #7c3aed;
+      line-height: 1;
+      margin-bottom: 4px;
+    }
+
+    .stat-card .label {
+      font-size: 0.8rem;
+      color: #9ca3af;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.6px;
+    }
+
+    .card {
+      background: white;
+      border-radius: 16px;
+      padding: 28px;
+      margin-bottom: 20px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+    }
+
+    .section-label {
+      font-size: 0.72rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: #7c3aed;
+      margin-bottom: 6px;
+    }
+
+    .card h2 {
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: #1e1b4b;
+      margin-bottom: 20px;
+    }
+
+    /* Bar chart rows */
+    .bar-row {
+      margin-bottom: 14px;
+    }
+
+    .bar-row:last-child { margin-bottom: 0; }
+
+    .bar-meta {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 5px;
+    }
+
+    .bar-meta .bar-label {
+      font-size: 0.88rem;
+      font-weight: 600;
+      color: #374151;
+    }
+
+    .bar-meta .bar-count {
+      font-size: 0.82rem;
+      color: #9ca3af;
+      font-weight: 600;
+    }
+
+    .bar-track {
+      background: #f3f4f6;
+      border-radius: 99px;
+      height: 10px;
+      overflow: hidden;
+    }
+
+    .bar-fill {
+      height: 100%;
+      border-radius: 99px;
+      background: linear-gradient(90deg, #667eea, #764ba2);
+      transition: width 0.8s ease;
+    }
+
+    .bar-fill.gold { background: linear-gradient(90deg, #f59e0b, #d97706); }
+    .bar-fill.green { background: linear-gradient(90deg, #10b981, #059669); }
+    .bar-fill.pink  { background: linear-gradient(90deg, #ec4899, #db2777); }
+    .bar-fill.blue  { background: linear-gradient(90deg, #3b82f6, #2563eb); }
+    .bar-fill.teal  { background: linear-gradient(90deg, #14b8a6, #0d9488); }
+
+    /* Winner badge */
+    .winner-badge {
+      display: inline-block;
+      background: #fef3c7;
+      color: #92400e;
+      font-size: 0.7rem;
+      font-weight: 700;
+      padding: 2px 8px;
+      border-radius: 99px;
+      margin-left: 8px;
+      vertical-align: middle;
+    }
+
+    /* Trip type donut-style */
+    .trip-split {
+      display: flex;
+      gap: 16px;
+      align-items: stretch;
+    }
+
+    .trip-box {
+      flex: 1;
+      border: 2px solid #e5e7eb;
+      border-radius: 12px;
+      padding: 20px;
+      text-align: center;
+    }
+
+    .trip-box.winner {
+      border-color: #7c3aed;
+      background: #f5f3ff;
+    }
+
+    .trip-box .t-icon { font-size: 2rem; margin-bottom: 6px; }
+    .trip-box .t-name { font-size: 0.9rem; font-weight: 700; color: #1e1b4b; margin-bottom: 4px; }
+    .trip-box .t-count { font-size: 1.6rem; font-weight: 700; color: #7c3aed; }
+    .trip-box .t-pct { font-size: 0.8rem; color: #9ca3af; }
+
+    /* Respondents table */
+    .respondents-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .respondent-row {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      padding: 14px;
+      background: #f9fafb;
+      border-radius: 10px;
+    }
+
+    .avatar {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      color: white;
+      font-weight: 700;
+      font-size: 0.85rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .respondent-details { flex: 1; min-width: 0; }
+    .respondent-name { font-weight: 700; color: #1e1b4b; font-size: 0.9rem; margin-bottom: 3px; }
+    .respondent-meta { font-size: 0.78rem; color: #6b7280; line-height: 1.5; }
+
+    .tag {
+      display: inline-block;
+      background: #ede9fe;
+      color: #5b21b6;
+      font-size: 0.7rem;
+      font-weight: 600;
+      padding: 2px 7px;
+      border-radius: 99px;
+      margin: 2px 2px 0 0;
+    }
+
+    .tag.date { background: #dbeafe; color: #1d4ed8; }
+    .tag.trip { background: #d1fae5; color: #065f46; }
+
+    /* Empty state */
+    .empty {
+      text-align: center;
+      padding: 48px 20px;
+      color: #9ca3af;
+    }
+
+    .empty .icon { font-size: 3rem; margin-bottom: 12px; }
+    .empty p { font-size: 0.95rem; }
+
+    /* Refresh + clear */
+    .toolbar {
+      display: flex;
+      gap: 10px;
+      justify-content: flex-end;
+      margin-bottom: 20px;
+    }
+
+    .btn {
+      padding: 9px 18px;
+      border-radius: 8px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      cursor: pointer;
+      border: none;
+      transition: opacity 0.2s;
+    }
+
+    .btn:hover { opacity: 0.85; }
+
+    .btn-refresh {
+      background: white;
+      color: #7c3aed;
+    }
+
+    .btn-clear {
+      background: rgba(255,255,255,0.2);
+      color: white;
+    }
+
+    /* Recommended section */
+    .recommendation {
+      border-left: 4px solid #7c3aed;
+      padding: 14px 16px;
+      background: #f5f3ff;
+      border-radius: 0 10px 10px 0;
+      margin-top: 16px;
+    }
+
+    .recommendation .rec-label {
+      font-size: 0.72rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      color: #7c3aed;
+      margin-bottom: 4px;
+    }
+
+    .recommendation p {
+      font-size: 0.88rem;
+      color: #374151;
+      line-height: 1.5;
+    }
+
+    @media (max-width: 500px) {
+      .stats-row { grid-template-columns: 1fr 1fr; }
+      .trip-split { flex-direction: column; }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+
+    <div class="header">
+      <h1>📊 Outing Results</h1>
+      <p>Live summary of team responses</p>
+    </div>
+
+    <div class="toolbar">
+      <button class="btn btn-clear" onclick="clearData()">🗑 Clear All Responses</button>
+      <button class="btn btn-refresh" onclick="renderDashboard()">↻ Refresh</button>
+    </div>
+
+    <div id="dashboard"></div>
+
+  </div>
+
+  <script>
+    function getResponses() {
+      return JSON.parse(localStorage.getItem('outingResponses') || '[]');
+    }
+
+    function clearData() {
+      if (confirm('Delete all responses? This cannot be undone.')) {
+        localStorage.removeItem('outingResponses');
+        renderDashboard();
+      }
+    }
+
+    function initials(name) {
+      return name.trim().split(/\s+/).map(w => w[0]).join('').toUpperCase().slice(0, 2);
+    }
+
+    function renderDashboard() {
+      const responses = getResponses();
+      const el = document.getElementById('dashboard');
+
+      if (responses.length === 0) {
+        el.innerHTML = `
+          <div class="card">
+            <div class="empty">
+              <div class="icon">📭</div>
+              <p>No responses yet. Share <strong>survey.html</strong> with your team!</p>
+            </div>
+          </div>`;
+        return;
+      }
+
+      const total = responses.length;
+
+      // --- Date tally ---
+      const allDates = [
+        'June 5','June 12','June 19','June 26',
+        'July 3','July 10','July 17','July 24','July 31'
+      ];
+      const dateCounts = {};
+      allDates.forEach(d => dateCounts[d] = 0);
+      responses.forEach(r => r.dates.forEach(d => { if (dateCounts[d] !== undefined) dateCounts[d]++; }));
+
+      const maxDate = Math.max(...Object.values(dateCounts));
+      const topDates = allDates.filter(d => dateCounts[d] === maxDate && maxDate > 0);
+
+      // --- Trip type tally ---
+      const tripCounts = { 'Full Day': 0, 'Overnight': 0 };
+      responses.forEach(r => { if (r.tripType) tripCounts[r.tripType]++; });
+      const topTrip = tripCounts['Full Day'] >= tripCounts['Overnight'] ? 'Full Day' : 'Overnight';
+
+      // --- Activity tally ---
+      const activityKeys = ['Adventure','Leisure','Learning','Volunteering','Mixed'];
+      const actColors = ['','gold','green','pink','blue','teal'];
+      const actCounts = {};
+      activityKeys.forEach(a => actCounts[a] = 0);
+      responses.forEach(r => r.activities.forEach(a => { if (actCounts[a] !== undefined) actCounts[a]++; }));
+      const maxAct = Math.max(...Object.values(actCounts));
+      const sortedActs = [...activityKeys].sort((a,b) => actCounts[b] - actCounts[a]);
+
+      // --- Recommendation ---
+      const recDate = topDates.length > 0 ? topDates.join(' or ') : '—';
+      const recActivity = sortedActs.filter(a => actCounts[a] === maxAct).join(' + ');
+
+      // --- Render ---
+      el.innerHTML = `
+
+        <!-- Summary stats -->
+        <div class="stats-row">
+          <div class="stat-card">
+            <div class="number">${total}</div>
+            <div class="label">Responses</div>
+          </div>
+          <div class="stat-card">
+            <div class="number">${topDates.length > 0 ? topDates[0] : '—'}</div>
+            <div class="label">Top Date</div>
+          </div>
+          <div class="stat-card">
+            <div class="number">${topTrip === 'Full Day' ? '☀️' : '🌙'} ${topTrip}</div>
+            <div class="label">Preferred Trip</div>
+          </div>
+        </div>
+
+        <!-- Dates -->
+        <div class="card">
+          <div class="section-label">Preferred Dates</div>
+          <h2>Which Friday works best?</h2>
+          ${allDates.map((d, i) => {
+            const count = dateCounts[d];
+            const pct = total > 0 ? Math.round((count / total) * 100) : 0;
+            const isTop = count === maxDate && maxDate > 0;
+            const colorClass = d.startsWith('June') ? 'blue' : 'teal';
+            return `
+              <div class="bar-row">
+                <div class="bar-meta">
+                  <span class="bar-label">${d}${isTop ? '<span class="winner-badge">⭐ Top Pick</span>' : ''}</span>
+                  <span class="bar-count">${count} vote${count !== 1 ? 's' : ''} (${pct}%)</span>
+                </div>
+                <div class="bar-track">
+                  <div class="bar-fill ${colorClass}" style="width:${pct}%"></div>
+                </div>
+              </div>`;
+          }).join('')}
+        </div>
+
+        <!-- Trip Type -->
+        <div class="card">
+          <div class="section-label">Trip Type</div>
+          <h2>Full Day vs Overnight</h2>
+          <div class="trip-split">
+            ${['Full Day','Overnight'].map(t => {
+              const c = tripCounts[t];
+              const pct = total > 0 ? Math.round((c/total)*100) : 0;
+              return `
+                <div class="trip-box ${t === topTrip ? 'winner' : ''}">
+                  <div class="t-icon">${t === 'Full Day' ? '☀️' : '🌙'}</div>
+                  <div class="t-name">${t}${t === topTrip ? ' <span class="winner-badge">Winner</span>' : ''}</div>
+                  <div class="t-count">${c}</div>
+                  <div class="t-pct">${pct}% of team</div>
+                </div>`;
+            }).join('')}
+          </div>
+        </div>
+
+        <!-- Activities -->
+        <div class="card">
+          <div class="section-label">Activity Preferences</div>
+          <h2>What does the team want to do?</h2>
+          ${sortedActs.map((a, i) => {
+            const count = actCounts[a];
+            const pct = total > 0 ? Math.round((count / total) * 100) : 0;
+            const isTop = count === maxAct && maxAct > 0;
+            const colorMap = { Adventure:'gold', Leisure:'blue', Learning:'pink', Volunteering:'green', Mixed:'teal' };
+            const icons = { Adventure:'🧗', Leisure:'🏖️', Learning:'🎨', Volunteering:'🤝', Mixed:'🎲' };
+            return `
+              <div class="bar-row">
+                <div class="bar-meta">
+                  <span class="bar-label">${icons[a]} ${a}${isTop ? '<span class="winner-badge">⭐ Top Pick</span>' : ''}</span>
+                  <span class="bar-count">${count} vote${count !== 1 ? 's' : ''} (${pct}%)</span>
+                </div>
+                <div class="bar-track">
+                  <div class="bar-fill ${colorMap[a]}" style="width:${pct}%"></div>
+                </div>
+              </div>`;
+          }).join('')}
+        </div>
+
+        <!-- Recommendation -->
+        <div class="card">
+          <div class="section-label">Planning Summary</div>
+          <h2>What to plan next</h2>
+          <p style="color:#6b7280; font-size:0.88rem; line-height:1.6;">Based on current responses, here's the team's preference at a glance:</p>
+          <div class="recommendation" style="margin-top:14px">
+            <div class="rec-label">Recommended Direction</div>
+            <p>
+              📅 <strong>Date:</strong> ${recDate}<br/>
+              🕐 <strong>Format:</strong> ${topTrip}<br/>
+              🎯 <strong>Activity focus:</strong> ${recActivity}<br/>
+              <br/>
+              Next steps: finalize <strong>location</strong>, <strong>food preferences</strong>, and <strong>budget</strong> based on the activity type above.
+            </p>
+          </div>
+        </div>
+
+        <!-- Individual Responses -->
+        <div class="card">
+          <div class="section-label">Individual Responses</div>
+          <h2>${total} Team Member${total !== 1 ? 's' : ''} Responded</h2>
+          <div class="respondents-list">
+            ${responses.map(r => `
+              <div class="respondent-row">
+                <div class="avatar">${initials(r.name)}</div>
+                <div class="respondent-details">
+                  <div class="respondent-name">${r.name}</div>
+                  <div class="respondent-meta">
+                    <span class="tag trip">${r.tripType || '—'}</span>
+                    ${r.dates.map(d => `<span class="tag date">${d}</span>`).join('')}
+                    ${r.activities.map(a => `<span class="tag">${a}</span>`).join('')}
+                  </div>
+                </div>
+              </div>`).join('')}
+          </div>
+        </div>
+
+      `;
+    }
+
+    renderDashboard();
+  </script>
+</body>
+</html>
