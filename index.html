@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+const SCRIPT_URL = https://script.google.com/macros/s/AKfycbwF3gkWGOsBkZ-XHzqemvatCcyOtcVXD_S84Juk983nqgPSbeKRji_GeAgkhfCNnTPzbA/exec;
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
@@ -510,6 +511,9 @@
   </div>
 
   <script>
+    // ⚠️ Paste your Google Apps Script Web App URL here after deploying
+    const SCRIPT_URL = 'YOUR_APPS_SCRIPT_URL';
+
     document.getElementById('surveyForm').addEventListener('submit', function(e) {
       e.preventDefault();
 
@@ -518,33 +522,37 @@
       const tripType = document.querySelector('input[name="tripType"]:checked')?.value;
       const activities = [...document.querySelectorAll('input[name="activities"]:checked')].map(el => el.value);
 
-      if (!name) {
-        alert('Please enter your name.');
-        return;
-      }
-      if (dates.length === 0) {
-        alert('Please select at least one preferred date.');
-        return;
-      }
-      if (!tripType) {
-        alert('Please select a trip type (Full Day or Overnight).');
-        return;
-      }
-      if (activities.length === 0) {
-        alert('Please select at least one activity preference.');
-        return;
-      }
+      if (!name) { alert('Please enter your name.'); return; }
+      if (dates.length === 0) { alert('Please select at least one preferred date.'); return; }
+      if (!tripType) { alert('Please select a trip type (Full Day or Overnight).'); return; }
+      if (activities.length === 0) { alert('Please select at least one activity preference.'); return; }
 
-      // Save to localStorage
-      const response = { name, dates, tripType, activities, submittedAt: new Date().toISOString() };
-      const existing = JSON.parse(localStorage.getItem('outingResponses') || '[]');
-      existing.push(response);
-      localStorage.setItem('outingResponses', JSON.stringify(existing));
+      const btn = e.target.querySelector('.submit-btn');
+      btn.disabled = true;
+      btn.textContent = 'Submitting...';
 
-      // Show thank you
-      document.getElementById('surveyForm').style.display = 'none';
-      const ty = document.getElementById('thankYou');
-      ty.style.display = 'block';
+      const payload = new URLSearchParams({
+        name,
+        dates: dates.join(', '),
+        tripType,
+        activities: activities.join(', ')
+      });
+
+      fetch(SCRIPT_URL, { method: 'POST', body: payload })
+        .then(res => res.json())
+        .then(data => {
+          if (data.result === 'success') {
+            document.getElementById('surveyForm').style.display = 'none';
+            document.getElementById('thankYou').style.display = 'block';
+          } else {
+            throw new Error(data.error || 'Submission failed');
+          }
+        })
+        .catch(err => {
+          btn.disabled = false;
+          btn.textContent = 'Submit My Preferences 🚀';
+          alert('Something went wrong: ' + err.message + '\nPlease try again.');
+        });
     });
   </script>
 </body>

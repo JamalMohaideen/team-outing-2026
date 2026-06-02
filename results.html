@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+const SCRIPT_URL = https://script.google.com/macros/s/AKfycbwF3gkWGOsBkZ-XHzqemvatCcyOtcVXD_S84Juk983nqgPSbeKRji_GeAgkhfCNnTPzbA/exec;
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
@@ -303,24 +304,43 @@
   </div>
 
   <script>
-    function getResponses() {
-      return JSON.parse(localStorage.getItem('outingResponses') || '[]');
+    // ⚠️ Paste your Google Apps Script Web App URL here after deploying
+    const SCRIPT_URL = 'YOUR_APPS_SCRIPT_URL';
+
+    async function getResponses() {
+      const res = await fetch(SCRIPT_URL);
+      if (!res.ok) throw new Error('Network error — could not reach the Apps Script.');
+      const data = await res.json();
+      if (data.result !== 'success') throw new Error(data.error || 'Unknown error from Apps Script.');
+      return data.submissions || [];
     }
 
     function clearData() {
-      if (confirm('Delete all responses? This cannot be undone.')) {
-        localStorage.removeItem('outingResponses');
-        renderDashboard();
-      }
+      alert('To delete responses, open your Google Sheet and remove the rows directly.');
     }
 
     function initials(name) {
       return name.trim().split(/\s+/).map(w => w[0]).join('').toUpperCase().slice(0, 2);
     }
 
-    function renderDashboard() {
-      const responses = getResponses();
+    async function renderDashboard() {
       const el = document.getElementById('dashboard');
+      el.innerHTML = `<div class="card"><div class="empty"><div class="icon">⏳</div><p>Loading responses...</p></div></div>`;
+
+      let responses;
+      try {
+        responses = await getResponses();
+      } catch (err) {
+        el.innerHTML = `
+          <div class="card">
+            <div class="empty">
+              <div class="icon">⚠️</div>
+              <p><strong>Could not load responses.</strong><br/>${err.message}<br/><br/>
+              Make sure you've set <code>FORMSPREE_ID</code> and <code>FORMSPREE_API_KEY</code> in results.html.</p>
+            </div>
+          </div>`;
+        return;
+      }
 
       if (responses.length === 0) {
         el.innerHTML = `
